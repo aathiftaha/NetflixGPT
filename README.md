@@ -1,7 +1,9 @@
 # Netflix GPT
 - npm create vite NetflixGPT
 - configured TailwindCSS
-
+- Header
+- Login Form
+- Sign up Form
 
 # Features
 - Login / Sign up
