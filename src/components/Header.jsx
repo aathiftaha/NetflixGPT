@@ -4,11 +4,14 @@ import { auth } from "../utils/firebase";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { addUser, removeUser } from "../slice/userSlice";
-import { LOGO } from "../utils/constant";
+import { LOGO, SUPPORTED_LANGUAGE } from "../utils/constant";
+import { toggleGPTSearchView } from "../slice/gptSlice";
+import { changeLanguage } from "../slice/configSlice";
 const Header = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const user = useSelector((store) => store.user);
+  const showGPTSearch = useSelector((store) => store.gpt.showGPTSearch);
   useEffect(() => {
     //Header is mounting Every time because its common in all page this will cause rerender and perfomance loss
     //so if my component unmounts then i need to unsubscribe
@@ -46,6 +49,13 @@ const Header = () => {
         navigate("/error");
       });
   };
+  const handleShowGPT = () => {
+    dispatch(toggleGPTSearchView());
+  };
+  const handleSelectLang = (e) => {
+    console.log("lang", e.target.value);
+    dispatch(changeLanguage(e.target.value));
+  };
   return (
     <div className="absolute w-full px-8 py-2 bg-gradient-to-b from-black z-20 flex justify-between items-center">
       {/* Logo */}
@@ -55,6 +65,28 @@ const Header = () => {
 
       {user && (
         <div className="flex items-center gap-4">
+          {showGPTSearch && (
+            <select
+              className="p-2 bg-gray-500 text-white"
+              onChange={handleSelectLang}
+            >
+              {SUPPORTED_LANGUAGE.map((lang) => {
+                return (
+                  <>
+                    <option key={lang.indentifier} value={lang.indentifier}>
+                      {lang.name}
+                    </option>
+                  </>
+                );
+              })}
+            </select>
+          )}
+          <button
+            onClick={handleShowGPT}
+            className="px-2 py-2 mx-4 bg-red-600 text-white cursor-pointer rounded-lg"
+          >
+            {showGPTSearch ? "Home Page" : "GPT Search"}
+          </button>
           <img
             className="w-10 h-10 rounded-md"
             src={user.photoURL}

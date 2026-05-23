@@ -16,3 +16,12 @@ export const API_OPTIONS = {
 };
 
 export const MOVIE_IMAGE_URL = "https://image.tmdb.org/t/p/w500";
+
+export const BG_URL =
+  "https://cdn.neowin.com/news/images/uploaded/2023/05/1683747988_background-size1920x1080-4e1694a6-75aa-4c36-9d4d-7fb6a3102005-bc5318781aad7f5c8520.jpg";
+
+export const SUPPORTED_LANGUAGE = [
+  { indentifier: "en", name: "English" },
+  { indentifier: "hindi", name: "Hindi" },
+  { indentifier: "spanish", name: "Spanish" },
+];

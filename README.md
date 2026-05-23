@@ -29,6 +29,12 @@
 - Embeded Youtube Video and make it autplay and mute
 - Added TailwindCSS to make it lok beautiful
 - Build Secondary Container with Movie List
+- Build Movie List
+- Build Movie Card
+- TMDB Image CDN
+- CustomHooks
+- GPT Search Feature
+- Multi-Language Feature in our App
 
 # Features
 
