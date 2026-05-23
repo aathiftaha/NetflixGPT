@@ -2,8 +2,18 @@
 - npm create vite NetflixGPT
 - configured TailwindCSS
 - Header
+- Routing
 - Login Form
 - Sign up Form
+- Form Validation
+- useRef Hooks
+- Firebase Setup
+- Firebase Deploying app to production
+- Create Signup user Account
+- Redux State
+- Implement Sign out Feature
+- Update Profile 
+- Fetch Movies from IMDB
 
 # Features
 - Login / Sign up

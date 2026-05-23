@@ -1,12 +1,126 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import Header from "./Header";
+import { checkValidateData } from "../utils/validate";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  updateProfile,
+} from "firebase/auth";
+
+import { auth } from "../utils/firebase";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { addUser } from "../userSlice";
 
 const Login = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   const [isSignInForm, setIsSignInForm] = useState(true);
+
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const name = useRef(null);
+  const email = useRef(null);
+  const password = useRef(null);
 
   const toggleSignInForm = () => {
     setIsSignInForm(!isSignInForm);
   };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    let message = null;
+
+    // Sign Up Validation
+    if (!isSignInForm) {
+      message = checkValidateData(
+        name.current.value.trim(),
+        email.current.value.trim(),
+        password.current.value.trim(),
+      );
+    } else {
+      // Sign In Validation
+      message = checkValidateData(
+        "",
+        email.current.value.trim(),
+        password.current.value.trim(),
+      );
+    }
+
+    setErrorMessage(message);
+
+    // Stop execution if validation fails
+    if (message) return;
+
+    // =========================
+    // SIGN UP
+    // =========================
+
+    if (!isSignInForm) {
+      createUserWithEmailAndPassword(
+        auth,
+        email.current.value,
+        password.current.value,
+      )
+        .then((userCredential) => {
+          const user = userCredential.user;
+          updateProfile(user, {
+            displayName: name.current.value,
+            photoURL:
+              "https://www.iconpacks.net/icons/2/free-user-icon-3296-thumb.png",
+          })
+            .then(() => {
+              const { uid, email, displayName, photoURL } = auth.currentUser;
+
+              dispatch(
+                addUser({
+                  uid,
+                  email,
+                  displayName,
+                  photoURL,
+                }),
+              );
+              navigate("/browse");
+            })
+            .catch((error) => {
+              setErrorMessage(error.message);
+            });
+
+          console.log(user);
+
+          // Redirect to Browse Page
+          navigate("/browse");
+        })
+        .catch((error) => {
+          setErrorMessage(error.code + " : " + error.message);
+        });
+    }
+
+    // =========================
+    // SIGN IN
+    // =========================
+    else {
+      signInWithEmailAndPassword(
+        auth,
+        email.current.value,
+        password.current.value,
+      )
+        .then((userCredential) => {
+          const user = userCredential.user;
+
+          console.log(user);
+
+          // Redirect to Browse Page
+          navigate("/browse");
+        })
+        .catch((error) => {
+          setErrorMessage(error.code + " : " + error.message);
+        });
+    }
+  };
+
   return (
     <div className="relative h-screen w-screen">
       <Header />
@@ -19,48 +133,63 @@ const Login = () => {
           alt="Bg-Image"
         />
 
-        {/* Dark Overlay */}
-        {/* <div className="absolute inset-0 bg-black opacity-60"></div> */}
+        {/* Overlay */}
+        <div className="absolute inset-0 bg-black opacity-60"></div>
       </div>
 
       {/* Login Form */}
       <div className="flex justify-center items-center h-screen">
-        <form className="relative z-10 bg-black bg-opacity-80 p-12 rounded-lg w-3/12 text-white">
+        <form
+          onSubmit={handleSubmit}
+          className="relative z-10 bg-black bg-opacity-80 p-12 rounded-lg w-3/12 text-white"
+        >
           <h1 className="text-3xl font-bold mb-8">
             {isSignInForm ? "Sign In" : "Sign Up"}
           </h1>
 
+          {/* Name Input */}
           {!isSignInForm && (
             <input
+              ref={name}
               type="text"
               placeholder="Full Name"
               className="w-full p-4 mb-4 rounded bg-gray-800 border border-gray-700 focus:outline-none"
             />
           )}
 
+          {/* Email */}
           <input
+            ref={email}
             type="text"
             placeholder="Email Address"
             className="w-full p-4 mb-4 rounded bg-gray-800 border border-gray-700 focus:outline-none"
           />
 
+          {/* Password */}
           <input
+            ref={password}
             type="password"
             placeholder="Password"
-            className="w-full p-4 mb-6 rounded bg-gray-800 border border-gray-700 focus:outline-none"
+            className="w-full p-4 mb-4 rounded bg-gray-800 border border-gray-700 focus:outline-none"
           />
 
+          {/* Error Message */}
+          <p className="text-red-500 font-bold mb-4">{errorMessage}</p>
+
+          {/* Button */}
           <button className="w-full bg-red-600 hover:bg-red-700 p-3 rounded font-semibold">
             {isSignInForm ? "Sign In" : "Sign Up"}
           </button>
 
+          {/* Toggle */}
           <p className="text-gray-400 mt-6">
-            {isSignInForm ? "New to Netflix?" : "Already a Registerd "}
+            {isSignInForm ? "New to Netflix?" : "Already Registered?"}
+
             <span
               className="text-white cursor-pointer hover:underline"
               onClick={toggleSignInForm}
             >
-              {isSignInForm ? " Sign up now" : "Sign in Now"}
+              {isSignInForm ? " Sign up Now" : " Sign in Now"}
             </span>
           </p>
         </form>
