@@ -27,6 +27,8 @@
 - planning for MainContainer & secondary Container
 - FetchData for Trailer Video
 - Embeded Youtube Video and make it autplay and mute
+- Added TailwindCSS to make it lok beautiful
+- Build Secondary Container with Movie List
 
 # Features
 
