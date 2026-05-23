@@ -1,11 +1,39 @@
-import React from "react";
-import { signOut } from "firebase/auth";
+import React, { useEffect } from "react";
+import { onAuthStateChanged, signOut } from "firebase/auth";
 import { auth } from "../utils/firebase";
 import { useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { addUser, removeUser } from "../slice/userSlice";
+import { LOGO } from "../utils/constant";
 const Header = () => {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
-  const user = useSelector((state) => state.user);
+  const user = useSelector((store) => store.user);
+  useEffect(() => {
+    //Header is mounting Every time because its common in all page this will cause rerender and perfomance loss
+    //so if my component unmounts then i need to unsubscribe
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        const { uid, email, displayName, photoURL } = user;
+
+        dispatch(
+          addUser({
+            uid,
+            email,
+            displayName,
+            photoURL,
+          }),
+        );
+        navigate("/browse");
+      } else {
+        dispatch(removeUser());
+        navigate("/");
+      }
+    });
+
+    //Unscubscribe when component unmounts means clean up the useEffect
+    return () => unsubscribe();
+  }, []);
   const handleSignout = () => {
     signOut(auth)
       .then(() => {
@@ -21,11 +49,7 @@ const Header = () => {
   return (
     <div className="absolute w-full px-8 py-2 bg-gradient-to-b from-black z-20 flex justify-between items-center">
       {/* Logo */}
-      <img
-        className="w-40"
-        src="https://help.nflxext.com/helpcenter/OneTrust/oneTrust_production_2026-05-14/consent/87b6a5c0-0104-4e96-a291-092c11350111/019ae4b5-d8fb-7693-90ba-7a61d24a8837/logos/dd6b162f-1a32-456a-9cfe-897231c7763c/4345ea78-053c-46d2-b11e-09adaef973dc/Netflix_Logo_PMS.png"
-        alt="logo"
-      />
+      <img className="w-40" src={LOGO} alt="logo" />
 
       {/* Right Section */}
 

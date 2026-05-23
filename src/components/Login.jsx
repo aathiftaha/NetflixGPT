@@ -9,12 +9,11 @@ import {
 
 import { auth } from "../utils/firebase";
 import { useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
-import { addUser } from "../userSlice";
+import { addUser } from "../slice/userSlice";
+import { USER_AVATAR } from "../utils/constant";
 
 const Login = () => {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
 
   const [isSignInForm, setIsSignInForm] = useState(true);
 
@@ -68,8 +67,7 @@ const Login = () => {
           const user = userCredential.user;
           updateProfile(user, {
             displayName: name.current.value,
-            photoURL:
-              "https://www.iconpacks.net/icons/2/free-user-icon-3296-thumb.png",
+            photoURL: USER_AVATAR,
           })
             .then(() => {
               const { uid, email, displayName, photoURL } = auth.currentUser;
@@ -82,7 +80,6 @@ const Login = () => {
                   photoURL,
                 }),
               );
-              navigate("/browse");
             })
             .catch((error) => {
               setErrorMessage(error.message);
@@ -91,7 +88,6 @@ const Login = () => {
           console.log(user);
 
           // Redirect to Browse Page
-          navigate("/browse");
         })
         .catch((error) => {
           setErrorMessage(error.code + " : " + error.message);
@@ -113,7 +109,6 @@ const Login = () => {
           console.log(user);
 
           // Redirect to Browse Page
-          navigate("/browse");
         })
         .catch((error) => {
           setErrorMessage(error.code + " : " + error.message);
