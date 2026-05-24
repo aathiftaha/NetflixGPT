@@ -5,6 +5,7 @@ import store from "./store/store";
 
 import Login from "./components/Login";
 import Browse from "./components/Browse";
+import WatchMovie from "./components/WatchMovie";
 
 const appRouter = createBrowserRouter([
   {
@@ -14,6 +15,10 @@ const appRouter = createBrowserRouter([
   {
     path: "/browse",
     element: <Browse />,
+  },
+  {
+    path: "/watch/:id",
+    element: <WatchMovie />,
   },
 ]);
 

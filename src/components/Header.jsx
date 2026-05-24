@@ -53,7 +53,6 @@ const Header = () => {
     dispatch(toggleGPTSearchView());
   };
   const handleSelectLang = (e) => {
-    console.log("lang", e.target.value);
     dispatch(changeLanguage(e.target.value));
   };
   return (
@@ -70,10 +69,10 @@ const Header = () => {
               className="p-2 bg-gray-500 text-white"
               onChange={handleSelectLang}
             >
-              {SUPPORTED_LANGUAGE.map((lang) => {
+              {SUPPORTED_LANGUAGE.map((lang, index) => {
                 return (
                   <>
-                    <option key={lang.indentifier} value={lang.indentifier}>
+                    <option key={index} value={lang.indentifier}>
                       {lang.name}
                     </option>
                   </>

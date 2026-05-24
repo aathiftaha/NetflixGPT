@@ -1,4 +1,5 @@
 import MovieCard from "./MovieCard";
+import { Link } from "react-router-dom";
 
 const MovieList = ({ title, moviesData }) => {
   if (!moviesData) return null;
@@ -11,9 +12,17 @@ const MovieList = ({ title, moviesData }) => {
         {/* Scroll row */}
         <div className="flex">
           {moviesData.length > 0
-            ? moviesData.map((movie) => (
-                <MovieCard key={movie.id} movie={movie} />
-              ))
+            ? moviesData.map((movie) => {
+                return (
+                  <>
+                    <Link to={"/watch/" + movie.id}>
+                      <div>
+                        <MovieCard key={movie.id} movie={movie} />
+                      </div>
+                    </Link>
+                  </>
+                );
+              })
             : "No Movies Available"}
         </div>
       </div>

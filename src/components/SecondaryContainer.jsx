@@ -5,7 +5,6 @@ const SecondaryContainer = ({
   topRatedMovies,
   upComingMovies,
 }) => {
-  console.log(topRatedMovies);
   {
     /* MovieList - Popular
       MovieCards in Horizontal

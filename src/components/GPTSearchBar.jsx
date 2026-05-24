@@ -1,10 +1,70 @@
-import React from "react";
+import React, { useRef } from "react";
 import { BG_URL } from "../utils/constant";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import lang from "../utils/langconstant";
+import openai from "../utils/openai";
+import { API_OPTIONS } from "../utils/constant";
+import { addGPTMovieResult } from "../slice/gptSlice";
 const GPTSearchBar = () => {
+  const dispatch = useDispatch();
+  const data = useSelector((store) => store.gpt.MovieNames);
+  console.log("Name", data);
   const userLang = useSelector((store) => store.config?.lang);
-  console.log("lang", userLang);
+  const searchText = useRef(null);
+  //search movie in TMDB
+  const searchMovieTMDB = async (movieName) => {
+    try {
+      const response = await fetch(
+        `https://api.themoviedb.org/3/search/movie?query=${movieName}&include_adult=false&language=en-US&page=1`,
+        API_OPTIONS,
+      );
+      const data = await response.json();
+      return data.results;
+    } catch (err) {
+      console.log(err.message);
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    console.log(searchText.current.value);
+    // Make an API Call
+    const getQuery =
+      "Act as a Movie Recommendation system and suggest some movies for the query" +
+      searchText.current.value +
+      " only give me name of 5 movies, comma seperated like the example result given ahead. Example Result: Gadar, Sholay, Don, Prince, Dilwale";
+    try {
+      // const gptResults = await openai.chat.completions.create({
+      //   model: "gpt-3.5-turbo",
+      //   messages: [{ role: "user", content: getQuery }],
+      // });
+      const mockGPTResults = [
+        {
+          index: 0,
+          message: {
+            role: "assistant",
+            content:
+              "Fury Road, John Wick, Die Hard, The Dark Knight, Gladiator",
+          },
+          finish_reason: "stop",
+        },
+      ];
+      const gptMovies = mockGPTResults[0]?.message?.content
+        .split(",")
+        .map((movie) => movie.trim());
+      //for each moive it will search TMDB API
+      const promiseArray = gptMovies.map((movie) => searchMovieTMDB(movie));
+      //[Promise,Promise,Promise,Promise,Promise] // Promise will take some time to fetch data.result so we put await
+      // Once all promise get settled and resolved then only we will get data
+      const tmdbResults = await Promise.all(promiseArray);
+      console.log(tmdbResults);
+      dispatch(
+        addGPTMovieResult({ movieResults: tmdbResults, movieNames: gptMovies }),
+      );
+    } catch (err) {
+      console.log(err.message);
+    }
+  };
 
   return (
     <div className="relative h-screen w-full flex items-center justify-center overflow-hidden">
@@ -33,8 +93,12 @@ const GPTSearchBar = () => {
         </p>
 
         {/* Search Form */}
-        <form className="mx-auto w-full md:w-2/3 lg:w-1/2 bg-black/60 backdrop-blur-xl border border-gray-700 rounded-2xl p-3 md:p-4 shadow-[0_8px_32px_rgba(0,0,0,0.7)] flex flex-col md:flex-row gap-4">
+        <form
+          onSubmit={handleSubmit}
+          className="mx-auto w-full md:w-2/3 lg:w-1/2 bg-black/60 backdrop-blur-xl border border-gray-700 rounded-2xl p-3 md:p-4 shadow-[0_8px_32px_rgba(0,0,0,0.7)] flex flex-col md:flex-row gap-4"
+        >
           <input
+            ref={searchText}
             type="text"
             placeholder={lang[userLang].gptSearchPlaceholder}
             className="flex-1 px-5 py-4 rounded-xl bg-gray-900/80 text-white placeholder-gray-400 border border-gray-700 outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition duration-300"

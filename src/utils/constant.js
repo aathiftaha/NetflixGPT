@@ -25,3 +25,5 @@ export const SUPPORTED_LANGUAGE = [
   { indentifier: "hindi", name: "Hindi" },
   { indentifier: "spanish", name: "Spanish" },
 ];
+
+export const ABBA_AI_KEY = import.meta.env.VITE_OPEN_AI_KEY;
